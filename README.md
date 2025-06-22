@@ -28,9 +28,6 @@ Board: ESP32-C3 SuperMini
 > [!WARNING]
 > 技术本无罪，善恶在人心！在中国等许多国家，非法入侵、干扰他人信号属于违法行为！本项目所有测试在内网进行，仅供学习研究目的，请妥善使用项目，若使用此项目造成损失乃至违法，造成的一切后果与作者无关（若不同意此协议，请勿使用本项目）
 
-ps:尊重原项目作者，本项目也使用GNU v3 License
-
-
 以下为原项目README.md内容：
 
 A project for the ESP32 that allows you to deauthenticate stations connected to WiFi network
