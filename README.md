@@ -15,8 +15,8 @@ Board: ESP32-C3 SuperMini
 
 ## 对于原项目的修改：
 * 关闭了原项目对于LED的控制(换掉了原先定义的LED Pin)，但代码未删除，可以自己改回来；同时，加入AP MAC随机化+对于周围WiFi的被动扫描
-* `main.cpp`: 添加了新的LED控制，具体来说，刷入固件后给板子上电，待Web界面准备完毕后LED会blink一下(duration 100ms); 添加了关于Boot按钮的控制，按下Boot按钮LED也会blink~; 同时，现在**板子在开机时会先扫描一遍周围网络(passive)，这样在Web界面里面就不用再按Rescan按钮啦**.限制了最大发射功率到12.5dBm
-* `web_interface.cpp`:更加优雅的UI，添加主芯片温度显示，添加DEAUTH ALL和StopAP按钮，控制更方便.添加自定义Reason Code输入框
+* `main.cpp`: 添加了新的LED控制，具体来说，刷入固件后给板子上电，待Web界面准备完毕后LED会blink一下(duration 100ms); 添加了关于Boot按钮的控制，按下Boot按钮(启动Deauth All)LED也会blink~; 同时，现在**板子在开机时会先扫描一遍周围网络(passive)，这样在Web界面里面就不用再按Rescan按钮啦**.限制了最大发射功率到12.5dBm
+* `web_interface.cpp`:更加优雅的UI和按钮排版+悬停动画.添加芯片温度显示，添加DEAUTH ALL和StopAP按钮，控制更方便.
 * `deauth.cpp`:改动最大，*Grok3*重写了Deauth All的代码，实现了真正的踢掉周围所有设备的网络(逻辑来源：[here](https://github.com/zRCrackiiN/DeauthKeychain)). 注：Deauth All时，板子发出的AP将会断开
 * `Others`: 小改动，懒得统计啦
 
