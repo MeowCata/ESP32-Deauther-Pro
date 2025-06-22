@@ -8,7 +8,7 @@ typedef struct {
   uint8_t sender[6];
   uint8_t access_point[6];
   uint8_t fragment_sequence[2] = { 0xF0, 0xFF };
-  uint16_t reason;
+  uint16_t reason = 0x0100;
 } deauth_frame_t;
 
 typedef struct {

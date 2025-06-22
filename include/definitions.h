@@ -1,12 +1,14 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#define AP_SSID "ESP32-Deauther"
-#define AP_PASS "esp32wroom32"
-#define LED 2
+#define AP_SSID "catc3"
+#define AP_PASS "azurecat"
+#define LED 10
+#define ledPin 8 //newly added
+#define buttonPin 9 //newly added (Onboard boot button on GPIO9 on ESP32-C3 SuperMini)
 #define SERIAL_DEBUG
 #define CHANNEL_MAX 13
-#define NUM_FRAMES_PER_DEAUTH 16
+#define NUM_FRAMES_PER_DEAUTH 15
 #define DEAUTH_BLINK_TIMES 2
 #define DEAUTH_BLINK_DURATION 20
 #define DEAUTH_TYPE_SINGLE 0
