@@ -28,16 +28,19 @@ void handle_root() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESP32-Deauther</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f4f4f4;
+            }
+            #networkTable tr:hover {
+                background-color: #e6f2ff !important;
+            }
         h1, h2 {
             color: #2c3e50;
         }
@@ -121,7 +124,7 @@ void handle_root() {
     <h2>ChipTemp: )raw" + String(temperature, 1) + R"raw( °C</h2>
 
     <h2>WiFi Networks</h2>
-    <table>
+    <table id="networkTable">
         <tr>
             <th>Number</th>
             <th>SSID</th>
@@ -153,13 +156,44 @@ void handle_root() {
     </div>
 
     <div class="button-group">
-        <form method="post" action="/deauth">
-            <h2>Launch Deauth-Attack</h2>
-            <input type="text" name="net_num" placeholder="Network Number">
-            <input type="number" name="reason" placeholder="Reason Code" min='0' max='24' value='1'>
-            <input type="submit" value="⚡ Launch Attack" class="warning">
-        </form>
+                <form method="post" action="/deauth" id="deauthForm">
+                    <h2>Launch Deauth-Attack</h2>
+                    <p>Click on a network row above to select target</p>
+                    <div id="selectedNetworkDisplay" style="margin: 10px 0; padding: 10px; background: #f0f0f0; border-radius: 4px; display: none;">
+                        Selected Network: <span id="selectedNetworkInfo">None</span>
+                    </div>
+                    <input type="hidden" name="net_num" id="selectedNetwork">
+                    <input type="number" name="reason" placeholder="Reason Code" min='0' max='24' value='1'>
+                    <input type="submit" value="⚡ Launch Attack" class="warning">
+                </form>
     </div>
+    <script> //by ds-v3
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.getElementById('networkTable');
+            const rows = table.getElementsByTagName('tr');
+            const form = document.getElementById('deauthForm');
+            const selectedNetworkInput = document.getElementById('selectedNetwork');
+            
+            for (let i = 1; i < rows.length; i++) {
+                rows[i].style.cursor = 'pointer';
+                rows[i].addEventListener('click', function() {
+                    // Remove highlight from all rows
+                    for (let j = 1; j < rows.length; j++) {
+                        rows[j].style.backgroundColor = '';
+                    }
+                    // Highlight selected row (removed blue border and bold)
+                    this.style.backgroundColor = '#d4edff';
+                    // Get network number from first cell
+                    selectedNetworkInput.value = this.cells[0].textContent;
+                    // Update display
+                    document.getElementById('selectedNetworkDisplay').style.display = 'block';
+                    document.getElementById('selectedNetworkInfo').textContent = 
+                        '#' + this.cells[0].textContent + ' - ' + this.cells[1].textContent + 
+                        ' (BSSID: ' + this.cells[2].textContent + ')';
+                });
+            }
+        });
+    </script>
 
     <h3>Eliminated devices: )raw" + String(eliminated_stations) + R"raw(</h3>
 
