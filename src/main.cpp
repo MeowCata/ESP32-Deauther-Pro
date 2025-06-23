@@ -1,3 +1,10 @@
+/**
+ * @file main.cpp 
+ * @brief Main program for ESP32 WiFi deauther
+ *
+ * Handles device initialization, button monitoring, and main operation loop
+ */
+
 #include <WiFi.h>
 #include <esp_wifi.h>
 #include "types.h"
@@ -7,13 +14,17 @@
 #include "definitions.h"
 #include "esp_task_wdt.h"
 
-int curr_channel = 1;
-bool buttonPreviouslyPressed = false;
+int currentChannel = 1;  // Tracks current WiFi channel for scanning
+bool wasButtonPressed = false;  // Tracks button press state
 
+/**
+ * @brief Blink LED once with minimal delay
+ */
 void blinkOnce() {
-  digitalWrite(ledPin, LOW);   // light up
-  delay(50);                  
-  digitalWrite(ledPin, HIGH);  // turn off
+  constexpr uint32_t blinkDuration = 50; // ms
+  digitalWrite(ledPin, LOW);   // LED on
+  delay(blinkDuration);                  
+  digitalWrite(ledPin, HIGH);  // LED off
 }
 void stopAP() {
   WiFi.disconnect();
@@ -27,44 +38,47 @@ void setup() {
   pinMode(LED, OUTPUT);
 #endif
 
+  // Initialize WiFi in AP mode with random MAC
   WiFi.mode(WIFI_MODE_AP);
   setRndMac();
   esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
-  WiFi.softAP(AP_SSID, AP_PASS, 1, true, 2); //hide SSID
-  DEBUG_PRINTF("AP started\n");
+  WiFi.softAP(AP_SSID, AP_PASS, 1, true, 2); // Hidden SSID, max 2 connections
+  
+  DEBUG_PRINTLN("[INIT] AP started");
   start_web_interface();
-  delay(50);
-  DEBUG_PRINTF("Web service started\n");
-  DEBUG_PRINTF("AP Using MAC: ");
+  delay(50); // Brief delay for web server initialization
+  DEBUG_PRINTLN("[INIT] Web service started");
+  DEBUG_PRINT("[INIT] AP MAC: ");
   DEBUG_PRINTLN(WiFi.softAPmacAddress());
 
+  // Initialize hardware
   pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, HIGH);       // HIGH is off
-  pinMode(buttonPin, INPUT_PULLUP); // BOOT button -> GND
-  delay(50);
-  blinkOnce();
+  digitalWrite(ledPin, HIGH); // LED off
+  pinMode(buttonPin, INPUT_PULLUP);
+  delay(50); // Debounce delay
+  blinkOnce(); // Visual confirmation of boot
 }
 
 void loop() {
-  bool buttonNowPressed = (digitalRead(buttonPin) == LOW); // LOW means button is pressed
-  // check if it was just pressed
-  if (buttonNowPressed && !buttonPreviouslyPressed) {
+  bool isButtonPressed = (digitalRead(buttonPin) == LOW); // Active-low button
+  
+  // Detect button press edge
+  if (isButtonPressed && !wasButtonPressed) {
     deauth_type = DEAUTH_TYPE_ALL;
     blinkOnce();
-    DEBUG_PRINTF("Now Deauth All APs. WebUI will be shut down\n");
+    DEBUG_PRINTLN("[MODE] Switching to deauth mode (WebUI disabled)");
     handle_deauth_all();
   }
-
-  // update status
-  buttonPreviouslyPressed = buttonNowPressed;
+  wasButtonPressed = isButtonPressed;
 
   if (deauth_type == DEAUTH_TYPE_ALL) {
-    if (curr_channel > CHANNEL_MAX) curr_channel = 1;
-    esp_wifi_set_channel(curr_channel, WIFI_SECOND_CHAN_NONE);
-    deauth_all();  // Perform scan and send deauth frames
-    curr_channel++;
-    delay(10);
+    // Cycle through channels
+    if (currentChannel > CHANNEL_MAX) currentChannel = 1;
+    esp_wifi_set_channel(currentChannel, WIFI_SECOND_CHAN_NONE);
+    deauth_all();  // Scan and deauth on current channel
+    currentChannel++;
+    delay(10); // Minimal delay for channel switching
   } else {
-    web_interface_handle_client();
+    web_interface_handle_client(); // Normal web interface mode
   }
 }

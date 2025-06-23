@@ -332,7 +332,7 @@ void handle_stop_ap() {
 void start_web_interface() {
   server.on("/", handle_root);
   server.on("/deauth", handle_deauth);
-  server.on("/deauth_all", handle_deauth_all);
+  server.on("/deauth_all", HTTP_POST, handle_deauth_all);
   server.on("/rescan", handle_rescan);
   server.on("/stop", handle_stop);
   server.on("/stop_ap", handle_stop_ap);
