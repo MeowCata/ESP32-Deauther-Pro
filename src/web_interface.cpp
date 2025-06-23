@@ -263,10 +263,10 @@ void handle_deauth() {
 <body>
     <div class="alert)raw";
 
-  if (wifi_number < num_networks) {
+    if (wifi_number < num_networks) {
     html += R"raw(">
         <h2>Starting Deauth-Attack!</h2>
-        <p>Deauthenticating network number: )raw" + String(wifi_number) + R"raw(</p>
+        <p>Deauthenticating network: )raw" + WiFi.SSID(wifi_number) + R"raw( (Network #)raw" + String(wifi_number) + R"raw()</p>
         <p>Reason code: )raw" + String(reason) + R"raw(</p>
     </div>)raw";
     start_deauth(wifi_number, DEAUTH_TYPE_SINGLE, reason);
